@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./reset.css">
+    <style>
+        body {
+            background-color: #945848;
+        }
+
+        #table {
+            width: 100%;
+            height: 800px;
+            background-color: #f3d040;
+            z-index: -1;
+            position: absolute;
+            margin-bottom: 0px;
+        }
+
+        #tv {
+            width: 1059px;
+            height: 950px;
+            background-image: url(./tv.png);
+            position: absolute;
+            margin-left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #bg {
+            width: 640px;
+            height: 480px;
+            background: #3fbfff;
+            cursor: url(./cursor.png) 50 50, auto;
+            overflow: hidden;
+            position: absolute;
+            margin-left: 438px;
+            transform: translateX(-50%);
+            margin-top: 12%;
+        }
+
+        #fly {
+            width: 640px;
+            height: 480px;
+            z-index: 2;
+            position: absolute;
+        }
+
+        #earth {
+            width: 640px;
+            height: 168px;
+            background-image: url(./onlyearth.png);
+            z-index: 999;
+            position: fixed;
+            bottom: 0px;
+
+        }
+
+        #fly>img {
+            position: absolute;
+        }
+
+        #tree {
+            width: 137px;
+            height: 238px;
+            background-image: url(./tree.png);
+            margin-top: 89px;
+            margin-left: 11px;
+            position: fixed;
+            z-index: 999;
+        }
+
+        #grass {
+            width: 62px;
+            height: 71px;
+            position: fixed;
+            background-image: url(./grass.png);
+            z-index: 999;
+            margin-top: 265px;
+            margin-left: 515px;
+        }
+
+        #text-box {
+            width: 75px;
+            height: 55px;
+            background: black;
+            color: white;
+            position: fixed;
+            z-index: 999;
+            margin-top: 400px;
+            margin-left: 500px;
+            border-radius: 10px;
+            border: 3px solid #a2ab14;
+            padding-left: 5px;
+        }
+
+        #text-score {
+            font-family: 'VT323', monospace;
+            font-size: 30px;
+            position: absolute;
+            line-height: 40px;
+        }
+
+        #text-time {
+            font-family: 'VT323', monospace;
+            font-size: 30px;
+            position: absolute;
+            line-height: 40px;
+        }
+
+        #score {
+            font-family: 'VT323', monospace;
+            font-size: 30px;
+            position: absolute;
+        }
+
+        #Time-box {
+
+            width: 75px;
+            height: 55px;
+            background: black;
+            color: white;
+            position: fixed;
+            z-index: 999;
+            margin-top: 400px;
+            margin-left: 400px;
+            border-radius: 10px;
+            border: 3px solid #a2ab14;
+            padding-left: 5px;
+        }
+
+        #btn-start {
+            font-family: 'VT323', monospace;
+            font-size: 30px;
+            width: 85px;
+            height: 50px;
+            background: black;
+            color: white;
+            z-index: 10;
+            position: fixed;
+            margin-top: 25%;
+            margin-left: 50%;
+            transform: translateX(-50%);
+            border: 3px solid white;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body ondragstart="return false" onselectstart="return false" onContextMenu="return false">
+    <div id="table"></div>
+    <div id="block"></div>
+    <div id="tv">
+        <div id="bg">
+            <div><button type="button" id="btn-start">START</button></div>
+            <div id="fly"></div>
+            <div id="grass"></div>
+            <div id="tree"></div>
+            <div id="earth"></div>
+            <div id="text-box">
+                <span id="score">SCORE</span>
+                <br>
+                <span id="text-score">0</span>
+            </div>
+            <div id="Time-box">
+                <span id="score">TIME</span>
+                <br>
+                <span id="text-time">10</span>
+            </div>
+        </div>
+
+        <!-- <input type="button" value="開始遊戲" id="btn-start"> -->
+        <script src="../jquery-3.5.0.min.js"></script>
+        <script>
+
+            // 分數
+            let score = 0;
+            // 剩餘時間
+            let timeleft = 10;
+            // 遊戲計時器
+            let gametimer = 0;
+            // 殭屍流水號
+            let zbid = 0;
+
+            const rand = (num) => {
+                return Math.round(Math.random() * num)
+            }
+
+            let storage = JSON.parse(localStorage.getItem("highscore"));
+            // 如果有分數紀錄
+
+
+
+
+            const movezb = (zbid) => {
+                $(`#zb${zbid}`).animate({
+                    top: rand(70) + "%",
+                    left: rand(70) + "%"
+                }, 3000, function () {
+                    movezb(zbid);
+                })
+            }
+
+            $("#btn-start").click(function () {
+                // 停用開始按鈕
+                $(this).hide();
+                $(this).attr("disabled", true);
+                // 重設
+                score = 0;
+                $("#text-score").text(score);
+                timeleft = 10;
+                $("#text-time").text(timeleft);
+
+                // 遊戲倒數
+                gametimer = setInterval(() => {
+                    // 倒數
+                    timeleft--;
+                    $("#text-time").text(timeleft);
+
+                    // 時間到
+                    if (timeleft == 0) {
+                        // 停止計時器
+                        clearInterval(gametimer);
+                        // 啟用開始按鈕
+                        $(this).show();
+                        $(this).attr("disabled", false);
+                        setTimeout(() => {
+                            alert("時間到");
+                        }, 100);
+                        // 清場
+                        $("#fly img").remove();
+
+                    }
+                    else {
+                        // 隨機
+                        const num = rand(10);
+
+                        // 如果抽到數字大於 5 ，生一個殭屍
+                        if (num > 3) {
+
+                            $("#fly").append(`<img src="./duck.gif" id="zb${zbid}">`);
+                            $(`#zb${zbid}`).css({
+                                top: rand(70) + "%",
+                                left: rand(70) + "%"
+                            })
+                            movezb(zbid);
+                            zbid++;
+                        }
+
+                    }
+
+                }, 1000)
+            })
+
+            $("#fly").on("click", "img", function () {
+                $(this).attr("src", "./dead3.gif");
+                $(this).stop();
+                setInterval(() => {
+                    $(this).remove();
+                }, 1000)
+                $(this).css("pointer-events", "none");
+                score++;
+                $("#text-score").text(score);
+            })
+
+        </script>
+</body>
+
+</html>
